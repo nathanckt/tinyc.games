@@ -1,7 +1,3 @@
-// Flappy -- http://tinyc.games -- (c) 2020 Jer Wilson
-//
-// Flappy is an extremely small implementation of the Flappy Bird game.
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -35,9 +31,11 @@ SDL_Event event;
 SDL_Renderer *renderer;
 SDL_Surface *surf;
 SDL_Texture *pillar;
-SDL_Texture *background;
 SDL_Texture *bird[4];
 TTF_Font *font;
+
+// New background color values
+int bg_r = 0, bg_g = 0, bg_b = 0;
 
 void setup();
 void new_game();
@@ -58,6 +56,17 @@ int main()
                         case SDL_QUIT:
                                 exit(0);
                         case SDL_KEYDOWN:
+                                if (event.key.keysym.sym == SDLK_ESCAPE)
+                                {
+                                        exit(0);
+                                }
+                                else if (event.key.keysym.sym == SDLK_b)
+                                {
+                                        // Randomize background color
+                                        bg_r = rand() % 256;
+                                        bg_g = rand() % 256;
+                                        bg_b = rand() % 256;
+                                }
                         case SDL_MOUSEBUTTONDOWN:
                                 if(gamestate == ALIVE)
                                 {
@@ -91,8 +100,6 @@ void setup()
         surf = SDL_LoadBMP("res/pillar.bmp");
         SDL_SetColorKey(surf, 1, 0xffff00);
         pillar = SDL_CreateTextureFromSurface(renderer, surf);
-        surf = SDL_LoadBMP("res/background.bmp");
-        background = SDL_CreateTextureFromSurface(renderer, surf);
 
         for(int i = 0; i < 4; i++)
         {
@@ -171,8 +178,9 @@ void update_pipe(int i)
 //draw everything in the game on the screen
 void draw_stuff()
 {
-        SDL_Rect dest = {0, 0, W, H};
-        SDL_RenderCopy(renderer, background, NULL, &dest);
+        // Set the background color
+        SDL_SetRenderDrawColor(renderer, bg_r, bg_g, bg_b, 255);
+        SDL_RenderClear(renderer);
 
         //draw pipes
         for(int i = 0; i < 2; i++)
